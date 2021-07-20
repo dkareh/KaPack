@@ -1,0 +1,236 @@
+:root {
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    background: #212121;
+    margin: 3em 0;
+}
+
+body:after {
+    content: "";
+    display: block;
+    height: 100vh;
+    left: 0;
+    position: fixed;
+    top: 0;
+    transition: background 0.5s ease;
+    width: 100%;
+    z-index: -100;
+}
+
+body.modal-visible {
+    overflow: hidden;
+}
+
+body.modal-visible:after {
+    background: #e0e0e088;
+    z-index: 10;
+}
+
+.card {
+    /* Empty */
+}
+
+.card__wrapper {
+    background: #424242;
+    border-radius: 0.4em;
+    box-shadow: 0 0 1em black;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.card:hover .card__wrapper {
+    transform: translateY(-0.5em);
+}
+
+.card__thumbnail {
+    user-select: none;
+    width: 100%;
+}
+
+.card__title {
+    color: #fafafa;
+    cursor: text;
+    font-size: 1.3em;
+    font-weight: 600;
+    margin: 0;
+    overflow: hidden;
+    padding: 0 0.4em 0 0.4em;
+    text-overflow: ellipsis;
+}
+
+.card__author {
+    color: #bdbdbd;
+    cursor: text;
+    font-size: 0.9em;
+    font-weight: 500;
+    margin: 0;
+    padding: 0 0 0.6em 0.7em;
+}
+
+.card__details-btn {
+    background: #616161;
+    border: 1px solid #9e9e9e;
+    border-radius: 2em;
+    color: #f5f5f5;
+    height: 2em;
+    opacity: 1;
+    padding: 0.2em;
+    position: absolute;
+    right: 0.5em;
+    transform: scale(0);
+    text-align: center;
+    top: 0.3em;
+    transition-duration: 0.3s;
+    transition-property: background, box-shadow, transform;
+    transition-timing-function: ease;
+    user-select: none;
+    width: 2em;
+}
+
+.card__details-btn:hover {
+    background: #424242;
+}
+
+.card__details-btn:active {
+    box-shadow: 0 0 0 0.25em #9e9e9eaa;
+}
+
+.card__details-btn:focus {
+    outline: none;
+}
+
+.card:hover .card__details-btn {
+    transform: scale(1);
+    transition-delay: 0s, 0s, 0.2s;
+}
+
+.grid {
+    column-gap: 1em;
+    display: grid;
+    grid-template-columns: repeat(2, 10em);
+    margin: 0 auto;
+    row-gap: 2em;
+    width: max-content;
+}
+
+.grid__item {
+    /* Empty */
+}
+
+.modal {
+    background: #424242;
+    border-radius: 0.4em;
+    left: 50%;
+    opacity: 0;
+    overflow: hidden;
+    position: fixed;
+    top: 100%;
+    transform: translateX(-50%);
+    transition-duration: 0.5s;
+    transition-property: opacity, top;
+    transition-timing-function: ease;
+    width: min(80%, 24em);
+    z-index: 20;
+}
+
+.modal--visible {
+    opacity: 1;
+    top: 20%;
+}
+
+.modal__header {
+    background: #616161;
+    height: 3.2em;
+    margin: 0;
+    padding-top: 0.2em;
+    position: relative;
+}
+
+.modal__title {
+    color: #f5f5f5;
+    font-size: 2em;
+    font-weight: 600;
+    margin-left: 0.5em;
+}
+
+.modal__close-btn {
+    color: #e0e0e0;
+    cursor: pointer;
+    font-size: 2em;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 0;
+    transition-duration: 0.3s;
+    transition-property: background, color;
+    transition-timing-function: ease;
+    user-select: none;
+    width: 1.6em;
+}
+
+.modal__close-btn:hover {
+    background: #21212122;
+    color: #f5f5f5;
+}
+
+.modal__close-btn:active {
+    background: #21212155;
+}
+
+.modal__table {
+    margin: 1.5em auto;
+    width: 80%;
+}
+
+.modal__group {
+    /* Empty */
+}
+
+.modal__label {
+    color: #e0e0e0;
+    font-weight: 600;
+    line-height: 1.5em;
+}
+
+.modal__value {
+    color: #f5f5f5;
+    line-height: 1.5em;
+    max-width: 7em;
+    overflow-wrap: break-word;
+}
+
+.modal--full-page {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    height: 95%;
+    width: 90%;
+}
+
+.modal--full-page.modal--visible {
+    top: 5%;
+}
+
+.modal__subtitle {
+    color: #bdbdbd;
+    font-size: 1em;
+    font-weight: 500;
+    margin-right: 2.5em;
+    text-align: right;
+}
+
+.modal__content {
+    color: #fafafa;
+    margin: 1em 2em;
+    max-height: 65%;
+    overflow-y: auto;
+}

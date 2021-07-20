@@ -1,0 +1,5 @@
+Bundlers need to use detect-indent to match the indentation of the source.
+I broke that feature while redoing the JS bundler. Fix it. Shouldn't be too hard.
+
+Consider using htmlparser2 for html parsing. Looks to be faster than parse5
+although less strict (fine for my use case).

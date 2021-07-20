@@ -1,0 +1,9 @@
+{
+    "models": ["foo", "bar", "baz"],
+    "lights": [
+        {
+            "position": [1, 2, 3],
+            "color": [255, 200, 50]
+        }
+    ]
+}

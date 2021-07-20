@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <!--
+    Feel free to comment any suggestions or ideas! :)
+
+    Currently implemented suggestions:
+        - Modal animations, suggested by @LeaferStudios
+    -->
+    <head>
+        <meta charset="utf-8">
+        <title>CSS Cards and Modals</title>
+
+        <link href="style.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="grid">
+            <div class="card grid__item">
+                <div class="card__wrapper">
+                    <img class="card__thumbnail" src="https://www.kasandbox.org/programming-images/seasonal/fireworks-scattered.png" draggable="false">
+                    <h1 class="card__title">Colorful Fireworks</h1>
+                    <h2 class="card__author">John Doe</h2>
+                    <span class="card__details-btn" tabindex="0">•••</span>
+                </div>
+            </div>
+            <div class="card grid__item">
+                <div class="card__wrapper">
+                    <img class="card__thumbnail" src="https://www.kasandbox.org/programming-images/seasonal/gingerbread-family.png" draggable="false">
+                    <h1 class="card__title">Gingerbread Cookies</h1>
+                    <h2 class="card__author">John Doe</h2>
+                    <span class="card__details-btn" tabindex="0">•••</span>
+                </div>
+            </div>
+            <div class="card grid__item">
+                <div class="card__wrapper">
+                    <img class="card__thumbnail" src="https://www.kasandbox.org/programming-images/seasonal/xmas-cookies.png" draggable="false">
+                    <h1 class="card__title">Cookies</h1>
+                    <h2 class="card__author">Daniel Kareh</h2>
+                    <span class="card__details-btn" tabindex="0">•••</span>
+                </div>
+            </div>
+            <div class="card grid__item">
+                <div class="card__wrapper">
+                    <img class="card__thumbnail" src="https://www.kasandbox.org/programming-images/seasonal/xmas-ornaments.png" draggable="false">
+                    <h1 class="card__title">Ornaments</h1>
+                    <h2 class="card__author">Jane Doe</h2>
+                    <span class="card__details-btn" tabindex="0">•••</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="details-modal" class="modal">
+            <div class="modal__header">
+                <span class="modal__title">Details</span>
+                <div class="modal__close-btn">&times;</div>
+            </div>
+            <table class="modal__table">
+                <tr class="modal__group">
+                    <td class="modal__label">Title</td>
+                    <td class="modal__value"></td>
+                </tr>
+                <tr class="modal__group">
+                    <td class="modal__label">Author</td>
+                    <td class="modal__value"></td>
+                </tr>
+                <tr class="modal__group">
+                    <td class="modal__label">Uploaded</td>
+                    <td class="modal__value">November 25, 2020</td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="post-modal" class="modal modal--full-page">
+            <div class="modal__header">
+                <span class="modal__title"></span>
+                <div class="modal__close-btn">&times;</div>
+            </div>
+            <p class="modal__content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras a convallis diam. Pellentesque hendrerit, purus et imperdiet fringilla, lectus tortor egestas nulla, vitae viverra enim erat in metus. Sed placerat ex in dolor lacinia, ac luctus felis consequat. Sed sit amet aliquet metus. Suspendisse ac dolor scelerisque, maximus ligula vel, aliquam velit. Vestibulum ut mauris a eros varius aliquet sit amet ut nulla. Fusce fermentum, ipsum eu venenatis mollis, neque ante imperdiet erat, gravida gravida mi dolor sed turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam condimentum interdum nisi id tempus. Phasellus eget cursus urna. Aliquam at auctor quam.</p>
+            <h2 class="modal__subtitle"></h2>
+        </div>
+
+        <script src="index.js"></script>
+    </body>
+</html>

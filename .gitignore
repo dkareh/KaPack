@@ -1,0 +1,2 @@
+# Add platform-specific ignore rules to ./git/info/exclude or to your global .gitconfig, not here.
+node_modules
