@@ -7,20 +7,17 @@ const bundleCommandConfig = {
 		version: {
 			alias: ["v"],
 			boolean: true,
-			desc: "Print version of program and exit."
+			desc: "Print version of program and exit.",
 		},
 		help: {
 			alias: ["h"],
 			boolean: true,
-			desc: "Print this message and exit."
-		}
+			desc: "Print this message and exit.",
+		},
 	},
 	positionals: ["path", "output"],
-	positionalsDescs: [
-		"Path of directory to bundle.",
-		"Path of file to output bundle in or - for stdout."
-	],
-	name: "khan-bundle"
+	positionalsDescs: ["Path of directory to bundle.", "Path of file to output bundle in or - for stdout."],
+	name: "khan-bundle",
 };
 const command = commandParser(process.argv.slice(2), bundleCommandConfig);
 
@@ -41,5 +38,7 @@ const outputStream = outputPath === "-" ? process.stdout : fs.createWriteStream(
 
 bundle(command.positionals.path).then((bundleString) => {
 	outputStream.write(bundleString);
-	if (outputStream !== process.stdout) { outputStream.close(); }
+	if (outputStream !== process.stdout) {
+		outputStream.close();
+	}
 });

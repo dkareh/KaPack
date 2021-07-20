@@ -14,25 +14,25 @@ function Vector(_secret, x, y, z) {
 }
 
 // This work-around is needed to avoid memory leaks.
-Vector.new = function() {
+Vector.new = function () {
     var instance = Object.create(Vector.prototype);
     Vector.apply(instance, [_SECRET].concat(Array.prototype.slice.call(arguments)));
     return instance;
 };
 
-Vector.prototype.toString = function() {
+Vector.prototype.toString = function () {
     return "{ " + this.x + ", " + this.y + ", " + this.z + " }";
 };
 
-Vector.add = function(a, b) {
+Vector.add = function (a, b) {
     return Vector.new(a.x + b.x, a.y + b.y, a.z + b.z);
 };
 
-Vector.sub = function(a, b) {
+Vector.sub = function (a, b) {
     return Vector.new(a.x - b.x, a.y - b.y, a.z - b.z);
 };
 
-Vector.prototype.lengthSq = function() {
+Vector.prototype.lengthSq = function () {
     return util.distanceSq(0, 0, this.x, this.y) + this.z * this.z;
 };
 

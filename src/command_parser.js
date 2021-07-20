@@ -13,7 +13,9 @@ function flattenOptions(options) {
 			// Redundant but makes code simpler (only one possibility).
 			info.canonicalName = name;
 		}
-		if (!Array.isArray(info.alias)) { continue; }
+		if (!Array.isArray(info.alias)) {
+			continue;
+		}
 		for (const alias of info.alias) {
 			options[alias] = Object.assign({}, info, { isAlias: true, canonicalName: name });
 		}
@@ -35,12 +37,14 @@ class CommandParser {
 	}
 
 	peek() {
-		const index = this.index, argv = this.argv;
+		const index = this.index,
+			argv = this.argv;
 		return index >= argv.length ? null : argv[index];
 	}
 
 	consume() {
-		const index = this.index, argv = this.argv;
+		const index = this.index,
+			argv = this.argv;
 		return index >= argv.length ? null : argv[this.index++];
 	}
 
@@ -177,7 +181,11 @@ class CommandParser {
 
 		if (positionals.length !== config.positionals.length) {
 			const plural = config.positionals.length !== 1;
-			this.error(`Expected ${config.positionals.length} positional argument${plural ? "s" : ""} but found ${positionals.length}`);
+			this.error(
+				`Expected ${config.positionals.length} positional argument${plural ? "s" : ""} but found ${
+					positionals.length
+				}`,
+			);
 		}
 
 		// Positional arguments already returned in array, but also
@@ -188,8 +196,12 @@ class CommandParser {
 
 		// Set defaults.
 		for (const [key, value] of Object.entries(this.config.options)) {
-			if (value.isAlias) { continue; }
-			if (!("default" in value)) { continue; }
+			if (value.isAlias) {
+				continue;
+			}
+			if (!("default" in value)) {
+				continue;
+			}
 			if (!(key in this.options)) {
 				this.options[key] = value.default;
 			}
@@ -244,7 +256,9 @@ function formatColumns(columns, padding) {
 	});
 	const paddedColumns = columns.map((column, index) => {
 		// No reason to pad the last column, nothing comes after it.
-		if (index === columns.length - 1) { return column; }
+		if (index === columns.length - 1) {
+			return column;
+		}
 		return column.map((row) => {
 			return row + " ".repeat(columnSizes[index] - stringWidth(row) + padding);
 		});
@@ -263,7 +277,10 @@ exports.generateUsageMessage = (config) => {
 
 	const optionText = Object.entries(config.options).map(([name, config]) => {
 		const alias = config.alias || [];
-		const names = [name].concat(alias).map((name) => (name.length === 1 ? "-" : "--") + name).join(",");
+		const names = [name]
+			.concat(alias)
+			.map((name) => (name.length === 1 ? "-" : "--") + name)
+			.join(",");
 		return [indent + names, config.desc];
 	});
 	string += term.heading("Options:") + "\n";

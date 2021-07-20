@@ -3,7 +3,9 @@
     font-family: "Segoe UI", sans-serif;
 }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
     box-sizing: inherit;
 }
 

@@ -27,7 +27,7 @@ const webpageSuffix = fs.readFileSync(path.resolve(__dirname, "webpage_suffix.js
 const acornConfig = {
 	ecmaVersion: 12,
 	sourceType: "module",
-	ranges: true
+	ranges: true,
 };
 
 function formatSpecifier(moduleVar, specifier) {
@@ -52,7 +52,9 @@ function formatImportNode(directory, filename, node) {
 	}
 
 	const specifiers = node.specifiers;
-	if (specifiers.length === 0) { return `require(${normalizedPath})`; }
+	if (specifiers.length === 0) {
+		return `require(${normalizedPath})`;
+	}
 	// When there is only one import specifier, simplify the code by
 	// not assigning the temporary module variable.
 	if (specifiers.length === 1) {
@@ -77,9 +79,11 @@ function formatExportDeclaration(mainSource, declaration, isConst) {
 		const range = declaration.init.range;
 		const init = `__temp__ = ${mainSource.substring(range[0], range[1])};`;
 
-		return [init].concat(declaration.id.properties.map((property) => {
-			return assignExport(`${property.value.name}`, `__temp__.${property.key.name}`);
-		}));
+		return [init].concat(
+			declaration.id.properties.map((property) => {
+				return assignExport(`${property.value.name}`, `__temp__.${property.key.name}`);
+			}),
+		);
 	}
 
 	if (declaration.init) {
@@ -125,17 +129,21 @@ function formatExportNode(directory, filename, mainSource, node) {
 
 		// Should be "VariableDeclaration".
 		const isConst = node.declaration.kind === "const";
-		return declaration.declarations.map((declaration) => formatExportDeclaration(mainSource, declaration, isConst))
-			.flat().join("\n");
+		return declaration.declarations
+			.map((declaration) => formatExportDeclaration(mainSource, declaration, isConst))
+			.flat()
+			.join("\n");
 	}
 
 	// Might be exporting values from current module or from another module.
 	const exportPrefix = node.source ? `require(${node.source.raw}).` : "";
-	return node.specifiers.map((specifier) => {
-		const localName = specifier.local.name === "default" ? "__default" : specifier.local.name;
-		const exportName = specifier.exported.name === "default" ? "__default" : specifier.exported.name;
-		return `__module__.${exportName} = ${exportPrefix}${localName};`;
-	}).join("\n");
+	return node.specifiers
+		.map((specifier) => {
+			const localName = specifier.local.name === "default" ? "__default" : specifier.local.name;
+			const exportName = specifier.exported.name === "default" ? "__default" : specifier.exported.name;
+			return `__module__.${exportName} = ${exportPrefix}${localName};`;
+		})
+		.join("\n");
 }
 
 function isImportNode(node) {
@@ -153,7 +161,8 @@ function transformSourceCode(directory, filename, string, ast) {
 	const importsAndExports = ast.body.filter((node) => isImportNode(node) || isExportNode(node));
 	return importsAndExports.reduceRight((string, node) => {
 		const range = node.range;
-		const formatted = isImportNode(node) ? formatImportNode(directory, filename, node)
+		const formatted = isImportNode(node)
+			? formatImportNode(directory, filename, node)
 			: formatExportNode(directory, filename, string, node);
 		return stringUtil.spliceString(string, range[0], range[1] - range[0], formatted);
 	}, string);
@@ -187,12 +196,13 @@ async function getAllImports(rootDirectory, directory, ast) {
 	const directImports = getDirectImports(ast);
 	const allImports = [];
 	for (const directImport of directImports) {
-		if (directImport === "pjs") { continue; } // pjs is included by default, no need to worry about it.
+		if (directImport === "pjs") {
+			continue;
+		} // pjs is included by default, no need to worry about it.
 
-		const normalizedPath = stringUtil.normalizePath(path.join(
-			path.relative(rootDirectory, directory),
-			path.normalize(directImport)
-		));
+		const normalizedPath = stringUtil.normalizePath(
+			path.join(path.relative(rootDirectory, directory), path.normalize(directImport)),
+		);
 		const fullPath = path.join(rootDirectory, normalizedPath);
 		const source = await fs.promises.readFile(fullPath, "utf-8");
 		if (fullPath.endsWith(".json")) {
@@ -246,18 +256,30 @@ async function bundleJS(directory, config) {
 	// TODO: If there are no imports, don't generate the module code.
 	// Just return the main source code untransformed.
 
-	const importSourceCode = allImports.map((importInfo) => {
-		let transformed = transformSourceCode(directory, importInfo.normalizedPath, importInfo.source, importInfo.ast);
-		transformed = stringUtil.indent(transformed, mainIndent);
-		return `addModule("${importInfo.normalizedPath}", function(__module__) {\n${transformed}\n});`;
-	}).join("\n\n");
+	const importSourceCode = allImports
+		.map((importInfo) => {
+			let transformed = transformSourceCode(
+				directory,
+				importInfo.normalizedPath,
+				importInfo.source,
+				importInfo.ast,
+			);
+			transformed = stringUtil.indent(transformed, mainIndent);
+			return `addModule("${importInfo.normalizedPath}", function(__module__) {\n${transformed}\n});`;
+		})
+		.join("\n\n");
 
 	const mainTransformed = transformSourceCode(directory, "main.js", mainSource, ast);
 
 	if (config.mode === "html") {
-		return webpagePrefix + "\n\n" + importSourceCode + "\n\n" +
+		return (
+			webpagePrefix +
+			"\n\n" +
+			importSourceCode +
+			"\n\n" +
 			`function main() {\n${stringUtil.indent(mainTransformed, mainIndent)}\n}\n\n` +
-			webpageSuffix;
+			webpageSuffix
+		);
 	}
 
 	// Optionally add header.js file.
@@ -267,9 +289,15 @@ async function bundleJS(directory, config) {
 		header += "\n";
 	} catch (error) {}
 
-	return header + processingJsPrefix + "\n\n" + importSourceCode + "\n\n" +
+	return (
+		header +
+		processingJsPrefix +
+		"\n\n" +
+		importSourceCode +
+		"\n\n" +
 		`function main() {\n${stringUtil.indent(mainTransformed, mainIndent)}\n}\n\n` +
-		processingJsSuffix;
+		processingJsSuffix
+	);
 }
 
 module.exports = async (directory, config) => {

@@ -18,7 +18,9 @@ exports.mapPerLine = (string, fn) => exports.splitIntoLines(string).map(fn).join
 const blankLineRegex = /^[\r\n]*$/;
 exports.indent = (string, indentation) => {
 	return exports.mapPerLine(string, (line) => {
-		if (blankLineRegex.test(line)) { return line; }
+		if (blankLineRegex.test(line)) {
+			return line;
+		}
 		return indentation + line;
 	});
 };

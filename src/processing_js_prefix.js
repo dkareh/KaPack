@@ -1,10 +1,14 @@
-var __temp__, __modules__ = {}, __currentModuleName__ = "main";
+var __temp__,
+    __modules__ = {},
+    __currentModuleName__ = "main";
 
-function getEnv() { return this; }
+function getEnv() {
+    return this;
+}
 var env = getEnv();
 
 function __exportAll(module, importModule) {
-    Object.getOwnPropertyNames(importModule).forEach(function(property) {
+    Object.getOwnPropertyNames(importModule).forEach(function (property) {
         if (property === "__default") {
             // Don't set default export.
             return;
@@ -16,7 +20,7 @@ function __exportAll(module, importModule) {
 function __exportConst(module, name, value) {
     Object.defineProperty(module, name, {
         value: value,
-        enumerable: true
+        enumerable: true,
     });
 
     // Object.defineProperty(module, name, {
@@ -38,7 +42,7 @@ function require(name) {
 // Do I even need a separate function when I'm doing
 // most of the checking beforehand? No.
 function addModule(name, func) {
-    __modules__[name] = function(module) {
+    __modules__[name] = function (module) {
         var previousModuleName = __currentModuleName__;
         __currentModuleName__ = name;
         func(module);

@@ -4,7 +4,7 @@ const $ = document.querySelector.bind(document);
 
 const canvas = $("#canvas");
 const gl = canvas.getContext("webgl2", {
-    preserveDrawingBuffer: true
+    preserveDrawingBuffer: true,
 });
 
 if (window.parent.__requestAnimFrameId) {
@@ -67,27 +67,27 @@ if (!gl.getProgramParameter(pinkProgram, gl.LINK_STATUS)) {
 
 const limeBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, limeBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -0.9, +0.9,
-    +0.9, +0.9,
-    +0.9, +0.1,
+gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([
+        -0.9, +0.9, +0.9, +0.9, +0.9, +0.1,
 
-    -0.9, +0.9,
-    -0.9, +0.1,
-    +0.9, +0.1,
-]), gl.STATIC_DRAW);
+        -0.9, +0.9, -0.9, +0.1, +0.9, +0.1,
+    ]),
+    gl.STATIC_DRAW
+);
 
 const pinkBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, pinkBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -0.9, -0.1,
-    +0.9, -0.1,
-    +0.9, -0.9,
+gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([
+        -0.9, -0.1, +0.9, -0.1, +0.9, -0.9,
 
-    -0.9, -0.1,
-    -0.9, -0.9,
-    +0.9, -0.9,
-]), gl.STATIC_DRAW);
+        -0.9, -0.1, -0.9, -0.9, +0.9, -0.9,
+    ]),
+    gl.STATIC_DRAW
+);
 
 gl.enableVertexAttribArray(0); // a_position location == 0
 
@@ -97,34 +97,38 @@ gl.enableVertexAttribArray(0); // a_position location == 0
 // for the uniform block.
 const uniformBuffer = gl.createBuffer();
 gl.bindBuffer(gl.UNIFORM_BUFFER, uniformBuffer);
-gl.bufferData(gl.UNIFORM_BUFFER, new Float32Array([
-    // Okay, in the vertex shader, we specified the layout
-    // of the uniform block to be std140. This is a standard
-    // layout that is the same on any implementation of
-    // WebGL. In our case, we have a vec2 and a float.
-    // The float goes first, which is scale in our case.
-    0.9,
+gl.bufferData(
+    gl.UNIFORM_BUFFER,
+    new Float32Array([
+        // Okay, in the vertex shader, we specified the layout
+        // of the uniform block to be std140. This is a standard
+        // layout that is the same on any implementation of
+        // WebGL. In our case, we have a vec2 and a float.
+        // The float goes first, which is scale in our case.
+        0.9,
 
-    // Next up is the vec2, which is translate. vec2s must
-    // be aligned to the size of two floats. What that means
-    // is that the offset of the first byte in a vec2 from
-    // the start of the buffer must be a multiple of 2 times
-    // the size of a float. But currently we only have an
-    // offset of one float currently, because of scale. So
-    // we need padding in between the data.
-    0.0,
+        // Next up is the vec2, which is translate. vec2s must
+        // be aligned to the size of two floats. What that means
+        // is that the offset of the first byte in a vec2 from
+        // the start of the buffer must be a multiple of 2 times
+        // the size of a float. But currently we only have an
+        // offset of one float currently, because of scale. So
+        // we need padding in between the data.
+        0.0,
 
-    // Now we can put our translate data as you'd expect.
-    0.1, -0.1
+        // Now we can put our translate data as you'd expect.
+        0.1, -0.1,
 
-    // For information about how to determine more complex
-    // layouts, see:
-    // https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
-    // Scroll down until about the middle of the page, to
-    // the section titled "Uniform block layout." Or you can
-    // look at the official specification:
-    // https://www.khronos.org/registry/OpenGL/specs/gl/glspec45.core.pdf#page=159
-]), gl.DYNAMIC_DRAW);
+        // For information about how to determine more complex
+        // layouts, see:
+        // https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
+        // Scroll down until about the middle of the page, to
+        // the section titled "Uniform block layout." Or you can
+        // look at the official specification:
+        // https://www.khronos.org/registry/OpenGL/specs/gl/glspec45.core.pdf#page=159
+    ]),
+    gl.DYNAMIC_DRAW
+);
 
 // If you're not using the std140 layout, then the layout
 // can depend on your system and you need to query
@@ -166,16 +170,20 @@ function render(time) {
     // operation. Everything else is already in place.
     // This makes it much more efficient!
     gl.bindBuffer(gl.UNIFORM_BUFFER, uniformBuffer);
-    gl.bufferData(gl.UNIFORM_BUFFER, new Float32Array([
-        // float scale
-        Math.cos(time * 2) * 0.2 + 0.8,
+    gl.bufferData(
+        gl.UNIFORM_BUFFER,
+        new Float32Array([
+            // float scale
+            Math.cos(time * 2) * 0.2 + 0.8,
 
-        0.0,
+            0.0,
 
-        // vec2 translate
-        Math.cos(time) * 0.1,
-        Math.sin(time) * 0.1,
-    ]), gl.DYNAMIC_DRAW);
+            // vec2 translate
+            Math.cos(time) * 0.1,
+            Math.sin(time) * 0.1,
+        ]),
+        gl.DYNAMIC_DRAW
+    );
 
     gl.useProgram(limeProgram);
     gl.bindBuffer(gl.ARRAY_BUFFER, limeBuffer);

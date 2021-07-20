@@ -13,7 +13,7 @@ function main() {
         backgroundColor = color(20, 30, 40),
         strokeColor = color(150);
 
-    pjs.draw = function() {
+    pjs.draw = function () {
         var time = millis() / 1000;
 
         pjs.background(backgroundColor);
@@ -25,7 +25,7 @@ function main() {
         pjs.stroke(pjs.lerpColor(backgroundColor, strokeColor, opacity));
 
         for (var i = 0; i < numPoints; i++) {
-            var theta = 180 * i / numPoints;
+            var theta = (180 * i) / numPoints;
 
             var outerX = cos(theta) * outerCircleRadius;
             var outerY = sin(theta) * outerCircleRadius;
@@ -37,15 +37,15 @@ function main() {
         pjs.stroke(20, 70, 170, (1 - opacity) * 255);
         pjs.noFill();
 
-        var fakeCircleX = 200 + cos(-time * 40) * outerCircleRadius / 2;
-        var fakeCircleY = 200 + sin(-time * 40) * outerCircleRadius / 2;
+        var fakeCircleX = 200 + (cos(-time * 40) * outerCircleRadius) / 2;
+        var fakeCircleY = 200 + (sin(-time * 40) * outerCircleRadius) / 2;
         pjs.ellipse(fakeCircleX, fakeCircleY, outerCircleRadius, outerCircleRadius);
 
         pjs.noStroke();
         pjs.fill(40, 150, 220);
 
         for (var i = 0; i < numPoints; i++) {
-            var theta = 180 * i / numPoints;
+            var theta = (180 * i) / numPoints;
 
             var outerX = cos(theta) * outerCircleRadius;
             var outerY = sin(theta) * outerCircleRadius;

@@ -20,7 +20,7 @@ function draw() {
     pjs.println("|a|^2 = " + a.lengthSq());
 }
 
-pjs.draw = function() {
+pjs.draw = function () {
     try {
         draw();
     } catch (error) {
