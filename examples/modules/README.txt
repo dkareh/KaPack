@@ -1,4 +1,4 @@
-This is just a random example of SyncKA in action.
+This is just a random example of KaPack in action.
 
 I should make it so that it updates if you change the description file.
 Right now it only changes if you update the config.

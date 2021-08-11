@@ -1,7 +1,7 @@
 {
-	"name": "khan-sync-cli",
+	"name": "ka-pack",
 	"version": "1.0.0",
-	"description": "The command line tool that powers KhanSync.",
+	"description": "A command line bundling tool for Khan Academy.",
 	"author": "Daniel Kareh",
 	"bin": {
 		"ka-pack": "./bin/ka-pack"
@@ -12,6 +12,7 @@
 	"dependencies": {
 		"acorn": "^8.0.5",
 		"detect-indent": "^6.0.0",
+		"htmlparser2": "^6.1.0",
 		"parse5": "^6.0.1",
 		"postcss": "^8.2.2",
 		"postcss-value-parser": "^4.1.0",
