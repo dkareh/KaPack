@@ -1,50 +1,12 @@
-// https://www.npmjs.com/package/htmlparser2
-// consider using this parser instead
-// much faster it seems
-// enough node location information to work with too
-
 const detectIndent = require("detect-indent");
 const fs = require("fs");
-const parse5 = require("parse5");
+const htmlparser2 = require("htmlparser2");
 const path = require("path");
 const postcss = require("postcss");
 const postcssValueParser = require("postcss-value-parser");
 
 const bundleJS = require("./bundle_javascript.js");
 const stringUtil = require("./string_util.js");
-
-function flattenNode(node) {
-	const nodes = [node];
-	if ("childNodes" in node) {
-		for (const childNode of node.childNodes) {
-			nodes.push(...flattenNode(childNode));
-		}
-	}
-	return nodes;
-}
-
-function findCssLinks(node) {
-	return flattenNode(node).filter((node) => {
-		return node.nodeName == "link" && getAttrValue(node, "rel") == "stylesheet";
-	});
-}
-
-function findScripts(node) {
-	return flattenNode(node).filter((node) => {
-		const src = getAttrValue(node, "src");
-		return node.nodeName == "script" && src != null && src != "";
-	});
-}
-
-function getAttrValue(element, name) {
-	if (!("attrs" in element)) {
-		return null;
-	}
-	for (const attr of element.attrs) {
-		if (attr.name == name) return attr.value;
-	}
-	return null;
-}
 
 function loadCssAndResolveImports(cssPath, alreadyImported = []) {
 	const source = fs.readFileSync(cssPath, "utf-8").trim();
@@ -123,99 +85,103 @@ function loadCssAndResolveImports(cssPath, alreadyImported = []) {
 		.trim();
 }
 
-async function handleReplacement(replacement, directory, singleIndent, baseIndent) {
-	// Handle CSS insertion.
-	if (replacement.tagName == "link") {
-		const href = path.join(directory, getAttrValue(replacement, "href"));
-		const mediaQuery = getAttrValue(replacement, "media");
-		try {
-			const mediaAttr = mediaQuery == null ? "" : ` media="${mediaQuery}"`;
-			const source = loadCssAndResolveImports(href);
-			const css = stringUtil.indent(source, baseIndent + singleIndent);
-			return `<style${mediaAttr}>\n${css}\n${baseIndent}</style>`;
-		} catch (error) {
-			return null;
-		}
-	}
-	// Handle script bundling.
-	if (replacement.tagName != "script") {
-		return null;
-	}
-	const type = getAttrValue(replacement, "type");
-	const typeAttr = type == null ? "" : ` type="${type}"`;
-	try {
-		// const code = common.indent(
-		// 	bundleJS(fs.readFileSync(path.join(directory, src), "utf-8").trim(),
-		// 	baseIndent + singleIndent
-		// );
-		const src = getAttrValue(replacement, "src");
-		if (src.endsWith(".js")) {
-			// TODO: Preserve all attributes, not just type.
-			const bundledCode = await bundleJS(directory, { mode: "html", main: src });
-			const indentedCode = stringUtil.indent(bundledCode.trim(), baseIndent /* + singleIndent*/);
-			return `<script${typeAttr}>\n${indentedCode}\n${baseIndent}</script>`;
-		}
-		// Assume that files not ending with .js are not JavaScript files
-		// and therefore should not be bundled. Just read and insert.
-		const sourceCode = await fs.promises.readFile(path.join(directory, src), "utf-8");
-		const indented = stringUtil.indent(sourceCode.trim(), baseIndent /* + singleIndent*/);
-		let otherAttrs = Object.values(replacement.attrs)
-			.filter((attr) => {
-				return attr.name !== "src";
-			})
-			.map((attr) => {
-				return `${attr.name}="${attr.value}"`;
-			})
-			.join(" ");
-		if (otherAttrs.length !== 0) {
-			otherAttrs = " " + otherAttrs;
-		}
-		return `<script${otherAttrs}>\n${indented}\n${baseIndent}</script>`;
-	} catch (error) {
-		return null;
-	}
-}
+// https://html.spec.whatwg.org/multipage/syntax.html#void-elements
+// prettier-ignore
+const voidElements = [
+	"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"
+];
 
-async function asyncReduceRight(array, fn, start) {
-	let value = start;
-	for (let index = array.length - 1; index >= 0; index--) {
-		value = await fn(value, array[index]);
-	}
-	return value;
-}
-
+/**
+ * @param {string} directory
+ * @param {string} html
+ */
 async function bundleHtml(directory, html) {
-	const document = parse5.parse(html, { sourceCodeLocationInfo: true });
-	const lines = html.split(/\r\n|\r|\n/);
-	const indents = lines.map((line) => (line.match(/^\s*/) || [""])[0]);
-	const htmlIndent = detectIndent(html).indent || "    ";
-	// Sort replacements into document order.
-	const replacements = findCssLinks(document)
-		.concat(findScripts(document))
-		.sort((a, b) => {
-			var _a, _b;
-			const aOffset = (_a = a.sourceCodeLocation) === null || _a === void 0 ? void 0 : _a.startOffset;
-			const bOffset = (_b = b.sourceCodeLocation) === null || _b === void 0 ? void 0 : _b.startOffset;
-			return aOffset - bOffset;
-		});
-
-	return asyncReduceRight(
-		replacements,
-		async (string, replacement) => {
-			const location = replacement.sourceCodeLocation;
-			const indent = indents[location.startLine - 1];
-			const stringToInsert = await handleReplacement(replacement, directory, htmlIndent, indent);
-			return stringToInsert == null
-				? string
-				: stringUtil.spliceString(
-						string,
-						location.startOffset,
-						location.endOffset - location.startOffset,
-						stringToInsert,
-				  );
+	let ignoreEventsUntilClose = false;
+	const segments = [];
+	const promises = [];
+	const parser = new htmlparser2.Parser(
+		{
+			onopentag(name, attributes) {
+				if (ignoreEventsUntilClose) return;
+				if (name == "script" && attributes.src) {
+					const newAttributes = Object.entries(attributes)
+						.filter(([key]) => key != "src")
+						.map(([key, value]) => ` ${key}="${value}"`)
+						.join("");
+					const newOpenTag = `<script${newAttributes}>`;
+					if (attributes.src.endsWith(".js")) {
+						segments.push(newOpenTag);
+						const promise = bundleJS(directory, {
+							mode: "html",
+							main: attributes.src,
+						});
+						const index = segments.length;
+						promise.then((data) => {
+							segments.splice(index, 0, data);
+						});
+						promises.push(promise);
+						ignoreEventsUntilClose = true;
+						return;
+					} else {
+						const contentsPromise = fs.promises.readFile(path.join(directory, attributes.src), "utf-8");
+						promises.push(contentsPromise);
+						const index = segments.length;
+						const original = html.substring(parser.startIndex, parser.endIndex + 1);
+						contentsPromise
+							.then((contents) => {
+								segments.splice(index, 0, newOpenTag + "\n" + contents);
+							})
+							.catch((reason) => {
+								segments.splice(index, 0, original);
+							});
+						ignoreEventsUntilClose = true;
+						return;
+					}
+				}
+				if (name == "link" && attributes.rel.includes("stylesheet") && attributes.href) {
+					const href = path.join(directory, attributes.href);
+					const mediaQuery = attributes.media;
+					try {
+						const mediaAttr = !mediaQuery ? "" : ` media="${mediaQuery}"`;
+						const source = loadCssAndResolveImports(href);
+						// const css = stringUtil.indent(source, baseIndent + singleIndent);
+						const css = source;
+						// segments.push(`<style${mediaAttr}>\n${css}\n${baseIndent}</style>`);
+						segments.push(`<style${mediaAttr}>\n${css}\n</style>`);
+						return;
+					} catch (error) {}
+				}
+				segments.push(html.substring(parser.startIndex, parser.endIndex + 1));
+			},
+			ontext(data) {
+				if (ignoreEventsUntilClose) return;
+				segments.push(data);
+			},
+			onclosetag(name) {
+				if (ignoreEventsUntilClose) {
+					segments.push(html.substring(parser.startIndex, parser.endIndex + 1));
+					ignoreEventsUntilClose = false;
+					return;
+				}
+				if (voidElements.includes(name)) return;
+				segments.push(html.substring(parser.startIndex, parser.endIndex + 1));
+			},
+			oncomment(data) {
+				if (ignoreEventsUntilClose) return;
+				segments.push(html.substring(parser.startIndex, parser.endIndex + 1));
+			},
+			onprocessinginstruction(name, data) {
+				if (ignoreEventsUntilClose) return;
+				segments.push("<" + data + ">");
+			},
 		},
-		html,
+		{},
 	);
+	parser.end(html);
+	try {
+		await Promise.allSettled(promises);
+	} catch (error) {}
+	return segments.join("");
 }
 
 module.exports = async (directory) => {
