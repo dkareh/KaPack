@@ -2,9 +2,15 @@
 
 ## Summary
 
-KaPack is a command line tool for packing separate files into a single file that can be copied into a Khan Academy program. The output preserves the indentation and format of the original source code, so it can be easily read by learners on KA.
+KaPack is a command line tool for packing separate files into a single file that can be copied into a Khan Academy (KA) program. The output preserves the indentation and format of the original source code, so it can be easily read by learners on KA.
 
 ## Usage
+
+```
+node /path/to/cli.js <directory> [output]
+```
+
+or, if you added the `bin` directory to your PATH
 
 ```
 ka-pack <directory> [output]
@@ -28,7 +34,11 @@ There is no build procedure. Just run `npm install` and you can start using ka-p
 
 ## Installing
 
-There isn't really an installation procedure either. If you want, you can add the `bin` directory to your `PATH`.
+There isn't really an installation procedure either. If you want, you can add the `bin` directory to your PATH.
+
+## Live Syncing
+
+This used to be a feature, but was then removed because I (Daniel) didn't think it was as useful as I hoped. However, I might re-incorporate the code that handled syncing in the browser with some modifications to make it better. But the primary focus as of now is to improve bundling. This means fixing bugs, finishing `TODO`s, adding documentation or useful features, making more things "just work", etc.
 
 ## Contributing
 
